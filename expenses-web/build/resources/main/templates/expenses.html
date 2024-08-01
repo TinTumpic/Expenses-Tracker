@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expenses</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+</head>
+<body>
+<div class="mx-auto col-8 mt-3">
+  <h2>Expenses List</h2>
+  <form method="post" enctype="multipart/form-data">
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+      <tr>
+        <th scope="col" class="text-center">Select</th>
+        <th th:remove="all" scope="col" class="text-center">ID</th>
+        <th scope="col" th:text="Price" class="text-center">First</th>
+        <th scope="col" th:text="Description" class="text-center">Last</th>
+        <th scope="col" th:text="Date" class="text-center">Handle</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:if="${#lists.isEmpty(expenses)}">
+        <td class="text-center" colspan="5">No Data</td>
+      </tr>
+      <tr th:each="expense : ${expenses}">
+        <td class="text-center"><input class="form-check-input" type="checkbox" name="selections" th:value="${expense.num}"></td>
+        <th scope="row" th:remove="all" th:text="${expense.num}" class="text-center">1</th>
+        <td th:text="${{expense.price}}" class="text-center">Mark</td>
+        <td th:text="${expense.description}" class="text-center">Otto</td>
+        <td th:text="${{expense.dop}}" class="text-center">@mdo</td>
+      </tr>
+      <tr th:remove="all">
+        <th scope="row">2</th>
+        <td>Jacob</td>
+        <td>Thornton</td>
+        <td>@fat</td>
+      </tr>
+      <tr th:remove="all">
+        <th scope="row">3</th>
+        <td colspan="2">Larry the Bird</td>
+        <td>@twitter</td>
+      </tr>
+      </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+      <ul th:if="${!expenses.empty}" class="pagination">
+        <li class="page-item" th:classappend="${expenses.first} ? 'disabled'"><a class="page-link" th:href="@{expenses(page=${expenses.number - 1})}">Previous</a></li>
+        <li th:each="page : ${#numbers.sequence(0, expenses.totalPages - 1)}" th:classappend="${expenses.number} == ${page} ? 'active'" class="page-item"><a class="page-link" th:href="@{expenses(page=${page})}" th:text="${page + 1}">1</a></li>
+        <li th:remove="all" class="page-item"><a class="page-link" href="#">2</a></li>
+        <li th:remove="all" class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item" th:classappend="${expenses.last} ? 'disabled'"><a class="page-link" th:href="@{expenses(page=${expenses.number + 1})}">Next</a></li>
+      </ul>
+      <ul class="pagination" th:if="${expenses.empty}">
+        <li class="page-item" th:classappend="${expenses.first} ? 'disabled'"><a class="page-link" th:href="@{expenses(page=${expenses.number - 1})}">Previous</a></li>
+        <li th:each="page : ${#numbers.sequence(0, expenses.totalPages)}" th:classappend="${expenses.number} == ${page} ? 'active'" class="page-item"><a class="page-link">0</a></li>
+        <li class="page-item" th:classappend="${expenses.last} ? 'disabled'"><a class="page-link" th:href="@{expenses(page=${expenses.number + 1})}">Next</a></li>
+      </ul>
+    </nav>
+    <button type="submit" name="action" value="delete" class="btn btn-danger mt-2">Delete</button>
+    <button type="submit" name="action" value="edit" class="btn btn-info mt-2 mx-2">Edit</button>
+    <button type="submit" name="action" value="reset" class="btn btn-warning mt-2">Reset</button>
+  </form>
+
+  <div>
+    <table class="table table-sm w-50 table-bordered border-dark mt-4">
+      <tr>
+        <td>Total amount:</td>
+        <td class="text-center" th:text="${{sum}}">2000</td>
+      </tr>
+    </table>
+  </div>
+
+  <form class="mt-4" th:object="${expense}" method="post" novalidate enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="inputDescription" class="form-label" th:text="Description"></label>
+      <input type="text" class="form-control" th:field="*{description}" placeholder="Example" th:errorclass="is-invalid" id="inputDescription" aria-describedby="emailHelp">
+      <div class="invalid-feedback" id="validationDescription" th:errors="*{description}">
+        Please choose a username.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="price" class="form-label" th:text="Price"></label>
+      <input type="number" th:field="*{price}" placeholder="999" class="form-control" th:errorclass="is-invalid" id="price">
+      <div class="invalid-feedback" id="validationPrice" th:errors="*{price}">
+        Please choose a username.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="dop" class="form-label" th:text="Date">Password</label>
+      <input type="date" th:field="*{dop}" placeholder="Date" th:errorclass="is-invalid" class="form-control" id="dop">
+      <div class="invalid-feedback" id="validationDOP" th:errors="*{dop}">
+        Please choose a username.
+      </div>
+    </div>
+    <input type="hidden" th:field="*{num}">
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+</body>
+</html>
